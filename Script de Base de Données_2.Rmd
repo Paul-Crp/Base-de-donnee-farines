@@ -11,11 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-options(max.print = 20)
+options(max.print = 11)
 ```
 
 ```{r}
-setwd("C:/Users/Pol/Desktop/Stage")
+setwd("C:/Users/Paul/Desktop/Stage/Donnee")
 load("Base_De_Donnees_Spectres.RData")
 ```
 
@@ -32,43 +32,42 @@ Base_De_Donnees_Spectres <- list(Annee2022 = list(), Annee2023 = list())
 # 2022
 
 ```{r}
-# Labo_rajout <- "AE Dijon Circuit A"
-# Labo_rajout <- "AE Dijon Circuit A retour Guadeloupe"
-# Labo_rajout <- "AE Dijon Circuit B retour"
-Labo_rajout <- "AE Dijon Circuit C retour"
-# Labo_rajout <- "AE Dijon"
-Labo <- Labo_rajout
-Spectro_rajout <- "FOSS 2500"
-# Spectro_rajout <- "FOSS 6500"
-Spectro <- Spectro_rajout
+Labo_rajout <- "UMP_Mtp"
+Spectro_rajout <- "Perkin_Frontier"
+
+Circuit <- "A"
+Resolution <- 2
+Unite_X <- "cm-1"
+Abs_ou_Ref <- "Abs"
+Labo_ou_Terrain <- "Labo"
 
 DateFormat <- "%Y-%m-%d"
-
-Circuit <- "C"
-Nb_Rep <- 1
-Type_Rep <- 1
-Resolution <- 0.5
-# Resolution <- 2
-Unite_X <- "nm"
-Abs_ou_Ref <- "Abs"
-Date <- NA
-Heure <- NA
-Temperature <- NA
-Hygrometrie <- NA
 
 # Pour un tableau XLSX, si la première ligne et colonne sont vides, faire comme si elles n'existaient pas.
 
 colonne_exclue <- c(1) # Tableau CSV uniquement
-colonne_date <- 2 # NA si pas de date/heure
-colonne_heure <- 3
-ligne_debut <- 1
-
-Annee = "Annee2022"
+colonne_date <- NA # NA si pas de date/heure
+colonne_heure <- NA
+colonne_temp <- NA
+colonne_hygro <- NA
+ligne_debut <- 5
 
 debut_ech <- 1
 fin_ech <- 184
 
 except_ech <- c(126, 127, 128, 129, 131, 132)
+
+Annee = "Annee2022"
+
+Type_Rep <- 1
+Nb_Rep <- 1
+
+Labo <- Labo_rajout
+Spectro <- Spectro_rajout
+Date <- NA
+Heure <- NA
+Temperature <- NA
+Hygrometrie <- NA
 ```
 
 ## Rajout d'un labo en 2022
@@ -91,7 +90,7 @@ if (!(Spectro_rajout %in% names(Base_De_Donnees_Spectres[[Annee]][["BGE7"]][[Lab
   for (i in (debut_ech:fin_ech)[- except_ech]) {
     Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]] <- list.append(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]], New_spectro = list(NULL))
     names(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]])[length(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]])] <- Spectro_rajout
-    Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro_rajout]] <- list(Mesure_1 = list(Meta = data.frame(Circuit = Circuit, Nb_Rep = Nb_Rep, Type_Rep = Type_Rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie), Spectre = NA))
+    Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro_rajout]] <- list(Mesure_1 = list(Meta = data.frame(Circuit = Circuit, Nb_Rep = Nb_Rep, Type_Rep = Type_Rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie), Spectre = NA))
   }
 }
 ```
@@ -165,7 +164,7 @@ for (i in (except_ech[1:4])) {
         } else {
           nom_actuel <- paste0(debut_fichier, i, fin_fichier)
         }
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = j + 1, Type_Rep = 1, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = j + 1, Type_Rep = 1, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Spectre"]] <- read.csv(paste(chemin, nom_actuel, sep = ""), header = FALSE)
       }
       
@@ -178,7 +177,7 @@ for (i in (except_ech[1:4])) {
       #   } else {
       #     nom_actuel <- paste0(debut_fichier, i, fin_fichier)
       #   }
-      #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = k + 5, Type_Rep = 2, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
+      #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = k + 5, Type_Rep = 2, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
       #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Spectre"]] <- read.csv(paste(chemin, nom_actuel, sep = ""), header = FALSE)
       # }
     },
@@ -196,31 +195,25 @@ save(Base_De_Donnees_Spectres, file = "Base_De_Donnees_Spectres.RData")
 ## Données non répétés 2022 (Tableau xlsx)
 
 ```{r}
-chemin_fichier <- "Data (ancien)/Circuit C/C-AE-Dijon/DIJON Inspir C retour a Dijon depuis Montpellier.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit B/B-AE-Dijon/DIJON Inspir B retour a Dijon depuis Gif.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir A retour a Dijon depuis Guadeloupe.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir A (Orléans)-Dijon-(Antilles).xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir export.xlsx"
+chemin_fichier <- "C:/Users/Paul/Desktop/Stage/Donnee/Data/Circuit A/A-BIOFORA-Orleans/INSPIR_INRAE_Orleans_PerkinElmerFrontier/INSPIR_INRAE_Orleans.xlsx"
 
-feuille <- "ds2500"
-# feuille <- "6500"
-debut <- "BGE22-"
-# fin <- "A"
-# fin <- "B"
-fin <- "C"
-# fin <- ""
+
+
+feuille <- "Perkin Elmer Frontier"
+debut <- "BGE22_"
+fin <- "A"
+
+colonne_ech <- 2
+colonne_premiere_mesure <- 7
 
 Spectro <- Spectro_rajout
 
 library(readxl)
 tableau <- read_excel(chemin_fichier, sheet = feuille, col_names = TRUE)
 
-colonne_premiere_mesure <- 6
-colonne_ech <- 1
-
-# except_ech <- c(19, 24, 118, 168, 62, 130, 148, 175, 126, 127, 128, 129, 131, 132)
 except_ech <- c(19, 24, 118, 168, 126, 127, 128, 129, 131, 132)
 # except_ech <- c(126, 127, 128, 129, 131, 132)
+# except_ech <- c(19, 24, 118, 168, 62, 130, 148, 175, 126, 127, 128, 129, 131, 132)
 
 # for (i in c(62, 130, 148, 175)) {
 for (i in (debut_ech:fin_ech)[- except_ech]) {
@@ -237,14 +230,14 @@ for (i in (debut_ech:fin_ech)[- except_ech]) {
         y = which(nom_actuel == tableau[, colonne_ech])
       
         # résolution pas en nom de colonne
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
         # résolution en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
       Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Date"]] <- format(tableau[[colonne_date]][[y]], format = "%D")
       
-      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Heure"]] <- format(tableau[[colonne_date]][[y]], format = "%H:%M:%S")
+      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Heure"]] <- format(tableau[[colonne_heure]][[y]], format = "%H:%M:%S")
       },
       warning = function(w) {
         print(i)
@@ -263,13 +256,13 @@ for (i in (debut_ech:fin_ech)[- except_ech]) {
         y = which(nom_actuel == tableau[, colonne_ech])
       
         # résolution pas en nom de colonne
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
         # résolution en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
         
         
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Date"]] <- ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y]], format = "%d/%m/%Y"))
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Date"]] <- ifelse(is.na(colonne_date), as.Date(NA), as.Date(as.numeric(tableau[[colonne_date]][[y]]), origin = "1899-12-30"))
       
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Heure"]] <- ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y]], format = "%H:%M:%S"))
         
@@ -286,18 +279,18 @@ for (i in (debut_ech:fin_ech)[- except_ech]) {
 
 ```{r}
 chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir export.xlsx"
-feuille <- "6500"
+feuille <- "spectresOK"
 debut <- "BGE22-"
-fin <- "C"
+fin <- " C"
 
 l <- 0 # 0 par défaut, décalage de toutes les mesures à répéter si on en a déjà précédemment (dans non répétés) (Ex: PEGASE St Gilles)
 
-nb_rep <- 15
-k <- 0 # 0 par défaut, décalage pour changer le type de répétition
-typ_rep <- 2
+nb_rep <- 5
+k <- 11 # 0 par défaut, décalage pour changer le type de répétition
+typ_rep <- 4
 
-colonne_premiere_mesure <- 5
-colonne_ech <- 1
+colonne_ech <- 2
+colonne_premiere_mesure <- 7
 
 Spectro <- Spectro_rajout
 
@@ -305,7 +298,7 @@ library(readxl)
 # tableau <- read_excel(chemin_fichier, sheet = feuille, col_names = TRUE)
 
 # except_ech <- c(19, 24, 118, 168, 126, 127, 128, 129, 131, 132)
-except_ech <- c(126, 127, 128, 129, 131, 132)
+# except_ech <- c(126, 127, 128, 129, 131, 132)
 
 # for (i in (debut_ech:fin_ech)[- except_ech]) {
 for (i in c(19, 24, 118, 168)) {
@@ -322,13 +315,13 @@ for (i in c(19, 24, 118, 168)) {
         }
         y = which(nom_actuel == tableau[, colonne_ech])
       
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = format(tableau[[colonne_date]][y[1 + k]], format = "%D"), Heure = format(tableau[[colonne_date]][y[1 + k]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = format(tableau[[colonne_date]][y[1 + k]], format = "%D"), Heure = format(tableau[[colonne_date]][y[1 + k]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         # résolution en nom de colonne
-        #Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         # résolution pas en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))) 
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         for (j in (2 + k):(nb_rep + k)) {
           if (i < 10) {
@@ -339,7 +332,7 @@ for (i in c(19, 24, 118, 168)) {
             nom_actuel <- paste0(debut, i, fin)
           }
           
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = format(tableau$Horodatage[y[j]], format = "%D"), Heure = format(tableau$Horodatage[y[j]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = format(tableau$Horodatage[y[j]], format = "%D"), Heure = format(tableau$Horodatage[y[j]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
           # résolution en nom de colonne
           # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
@@ -373,15 +366,15 @@ for (i in c(19, 24, 118, 168)) {
         }
         y = which(nom_actuel == tableau[, colonne_ech])
       
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         # résolution en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         # résolution pas en nom de colonne
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))) 
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         for (j in (2 + k):(nb_rep + k)) {
           if (i < 10) {
@@ -392,15 +385,15 @@ for (i in c(19, 24, 118, 168)) {
             nom_actuel <- paste0(debut, i, fin)
           }
           
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
-          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
           # résolution en nom de colonne
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
           
           # résolution pas en nom de colonne
-          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
       }
     },
     warning = function(w) {
@@ -511,13 +504,13 @@ for (i in c(19, 24, 118, 168)) {
       }
       y = which(nom_actuel == tableau[, 1])
       
-      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[1 + k]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[1 + k]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
       Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = unite, V2 = as.vector(unlist(lapply(tableau, `[[`, y[1 + k]), use.names = FALSE)[- colonne_exclue], 'numeric'))
       
       if (nb_rep != 1){
         for (j in (2 + k):(nb_rep + k)) {
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[j]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[j]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[j]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[j]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = unite, V2 = as.vector(unlist(lapply(tableau, `[[`, y[j]), use.names = FALSE)[- colonne_exclue], 'numeric'))
         }
@@ -621,7 +614,7 @@ for (i in c(19, 24, 118, 168)) {
       
       fichier <- read_csv(paste0("Data/Circuit B/B-IJPB-Versailles/INTERLABO24_240605/INTERLABO24_240605/", tableau[y[1], colonne_fichier]), show_col_types = FALSE)
       
-      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
+      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
       unite <- c(as.numeric(substr(as.character(fichier[45, ]), 1, 8)))
       
@@ -645,7 +638,7 @@ for (i in c(19, 24, 118, 168)) {
         
         fichier <- read_csv(paste0("Data/Circuit B/B-IJPB-Versailles/INTERLABO24_240605/INTERLABO24_240605/", tableau[y[j], colonne_fichier]), show_col_types = FALSE)
         
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         unite <- c(as.numeric(substr(as.character(fichier[45, ]), 1, 8)))
         
@@ -690,9 +683,9 @@ save(Base_De_Donnees_Spectres, file = "Base_De_Donnees_Spectres.RData")
 # Spectro <- Spectro_rajout
 
 colonne_exclue <- c(1) # Tableau CSV uniquement
-colonne_date <- 2 # NA si pas de date/heure
-colonne_heure <- 3
-ligne_debut <- 1
+colonne_date <- NA # NA si pas de date/heure
+colonne_heure <- NA
+ligne_debut <- 5
 
 Annee = "Annee2023"
 
@@ -702,6 +695,8 @@ ech <- c(3, 63, 173, 187, 7, 15, 19, 23, 31, 35, 42, 64, 104, 108, 125, 127, 128
 ## Rajout d'un labo en 2023
 
 ```{r}
+library(rlist)
+
 if (!(Labo_rajout %in% names(Base_De_Donnees_Spectres[[Annee]][["BGE7"]]))) {
   for (i in ech) {
     Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]] <- list.append(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]], New_lab = list())
@@ -717,7 +712,7 @@ if (!(Spectro_rajout %in% names(Base_De_Donnees_Spectres[[Annee]][["BGE7"]][[Lab
   for (i in ech) {
     Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]] <- list.append(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]], New_spectro = list(NULL))
     names(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]])[length(Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]])] <- Spectro_rajout
-    Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro_rajout]] <- list(Mesure_1 = list(Meta = data.frame(Circuit = Circuit, Nb_Rep = Nb_Rep, Type_Rep = Type_Rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie), Spectre = NA))
+    Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro_rajout]] <- list(Mesure_1 = list(Meta = data.frame(Circuit = Circuit, Nb_Rep = Nb_Rep, Type_Rep = Type_Rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie), Spectre = NA))
   }
 }
 ```
@@ -775,7 +770,7 @@ for (i in (ech[1:4])) {
         } else {
           nom_actuel <- paste0(debut_fichier, i, fin_fichier)
         }
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = j + 1, Type_Rep = 1, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = j + 1, Type_Rep = 1, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + 1)]][["Spectre"]] <- read.csv(paste(chemin, nom_actuel, sep = ""), header = FALSE)
       }
       
@@ -788,7 +783,7 @@ for (i in (ech[1:4])) {
       #   } else {
       #     nom_actuel <- paste0(debut_fichier, i, fin_fichier)
       #   }
-      #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = k + 5, Type_Rep = 2, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
+      #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = k + 5, Type_Rep = 2, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = Heure, Temperature = Temperature, Hygrometrie = Hygrometrie)
       #   Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", k + 5)]][["Spectre"]] <- read.csv(paste(chemin, nom_actuel, sep = ""), header = FALSE)
       # }
     },
@@ -807,24 +802,18 @@ save(Base_De_Donnees_Spectres, file = "Base_De_Donnees_Spectres.RData")
 
 ```{r}
 chemin_fichier <- "Data (ancien)/Circuit C/C-AE-Dijon/DIJON Inspir C retour a Dijon depuis Montpellier.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit B/B-AE-Dijon/DIJON Inspir B retour a Dijon depuis Gif.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir A retour a Dijon depuis Guadeloupe.xlsx"
-# chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir A (Orléans)-Dijon-(Antilles).xlsx"
 
-feuille <- "ds2500"
-# feuille <- "6500"
+feuille <- "spectresOK"
 debut <- "BGE23-"
-# fin <- "A"
-# fin <- "B"
-fin <- "C"
+fin <- " C"
 
 Spectro <- Spectro_rajout
 
 library(readxl)
-tableau <- read_excel(chemin_fichier, sheet = feuille, col_names = TRUE)
+# tableau <- read_excel(chemin_fichier, sheet = feuille, col_names = TRUE)
 
-colonne_premiere_mesure <- 5
-colonne_ech <- 1
+colonne_ech <- 2
+colonne_premiere_mesure <- 7
 
 ech <- c(3, 63, 173, 187, 7, 15, 19, 23, 31, 35, 42, 64, 104, 108, 125, 127, 128, 129, 131, 133, 136, 151, 169, 176, 177, 184, 192, 193, 198, 199)
 
@@ -847,9 +836,8 @@ for (i in (ech)[- (1:4)]) {
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
         # résolution en nom de colonne
-        #Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
-        
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Date"]] <- format(tableau[[colonne_date]][[y]], format = "%D")
       
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Heure"]] <- format(tableau[[colonne_date]][[y]], format = "%H:%M:%S")
@@ -872,11 +860,11 @@ for (i in (ech)[- (1:4)]) {
         y = which(nom_actuel == tableau[, colonne_ech])
       
         # résolution pas en nom de colonne
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
         
         
         # résolution en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y, colonne_premiere_mesure:length(tableau[y, ])])))), V2 = t(t(as.numeric(tableau[y, colonne_premiere_mesure:length(tableau[y, ])]))))
       
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][["Mesure_1"]][["Meta"]][["Date"]] <- ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y]], format = "%d/%m/%Y"))
       
@@ -898,18 +886,16 @@ for (i in (ech)[- (1:4)]) {
 # chemin_fichier <- "Data (ancien)/Circuit A/A-AE-Dijon/circuits lots globaux/DIJON Inspir export.xlsx"
 # feuille <- "6500"
 debut <- "BGE23-"
-# fin <- "A"
-# fin <- "B"
-fin <- "C"
+fin <- " C"
 
 l <- 0 # 0 par défaut, décalage de toutes les mesures à répéter si on en a déjà précédemment (dans non répétés) (Ex: PEGASE St Gilles)
 
-nb_rep <- 15
-k <- 0 # 0 par défaut, décalage pour changer le type de répétition
-typ_rep <- 2
+nb_rep <- 5
+k <- 11 # 0 par défaut, décalage pour changer le type de répétition
+typ_rep <- 4
 
-colonne_premiere_mesure <- 5
-colonne_ech <- 1
+colonne_ech <- 2
+colonne_premiere_mesure <- 7
 
 Spectro <- Spectro_rajout
 
@@ -932,7 +918,7 @@ for (i in (ech[1:4])) {
         }
         y = which(nom_actuel == tableau[, colonne_ech])
       
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = format(tableau[[colonne_date]][[y[1 + k]]], format = "%D"), Heure = format(tableau[[colonne_date]][[y[1 + k]]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = format(tableau[[colonne_date]][[y[1 + k]]], format = "%D"), Heure = format(tableau[[colonne_date]][[y[1 + k]]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         # résolution en nom de colonne
         # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
@@ -949,13 +935,13 @@ for (i in (ech[1:4])) {
             nom_actuel <- paste0(debut, i, fin)
           }
           
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = format(tableau$Horodatage[y[j]], format = "%D"), Heure = format(tableau$Horodatage[y[j]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = format(tableau$Horodatage[y[j]], format = "%D"), Heure = format(tableau$Horodatage[y[j]], format = "%H:%M:%S"), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
           # longueur en nom de colonne
-          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
           
           # longueur pas en nom de colonne
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
       }
     },
     warning = function(w) {
@@ -983,15 +969,15 @@ for (i in (ech[1:4])) {
         }
         y = which(nom_actuel == tableau[, colonne_ech])
       
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         # résolution en nom de colonne
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
+        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         # résolution pas en nom de colonne
-        # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])])))) 
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[1 + k], colonne_premiere_mesure:length(tableau[y[1 + k], ])]))))
       
         for (j in (2 + k):(nb_rep + k)) {
           if (i < 10) {
@@ -1002,15 +988,15 @@ for (i in (ech[1:4])) {
             nom_actuel <- paste0(debut, i, fin)
           }
           
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, format(tableau[[colonne_date]][[y[1 + k]]], format = "%d/%m/%Y")), Heure = ifelse(is.na(colonne_heure), Heure, format(tableau[[colonne_heure]][[y[1 + k]]], format = "%H:%M:%S")), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
-          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = Date, Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
           
           # résolution en nom de colonne
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(colnames(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])])))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
           
           # résolution pas en nom de colonne
-          # Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = t(t(as.numeric(tableau[ligne_debut - 1, colonne_premiere_mesure:length(tableau[ligne_debut - 1, ])]))), V2 = t(t(as.numeric(tableau[y[j], colonne_premiere_mesure:length(tableau[y[j], ])]))))
       }
     },
     warning = function(w) {
@@ -1111,13 +1097,13 @@ for (i in (ech[1:4])) {
       }
       y = which(nom_actuel == tableau[, 1])
       
-      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[1 + k]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[1 + k]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[1 + k]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
       Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Spectre"]] <- data.frame(V1 = unite, V2 = as.vector(unlist(lapply(tableau, `[[`, y[1 + k]), use.names = FALSE)[- colonne_exclue], 'numeric'))
       
       if (nb_rep != 1){
         for (j in (2 + k):(nb_rep + k)) {
-          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[j]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[j]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
+          Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = ifelse(is.na(colonne_date), Date, tableau[[colonne_date]][[y[j]]]), Heure = ifelse(is.na(colonne_heure), Heure, tableau[[colonne_heure]][[y[j]]]), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
         Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", j + l)]][["Spectre"]] <- data.frame(V1 = unite, V2 = as.vector(unlist(lapply(tableau, `[[`, y[j]), use.names = FALSE)[- colonne_exclue], 'numeric'))
         }
@@ -1250,7 +1236,7 @@ for (i in (ech[1:4])) {
       
       fichier <- read_csv(paste0("Data/Circuit B/B-IJPB-Versailles/INTERLABO24_240605/INTERLABO24_240605/", tableau[y[1], colonne_fichier]), show_col_types = FALSE)
       
-      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
+      Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (1 + l + k))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = 1, Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
         
       unite <- c(as.numeric(substr(as.character(fichier[45, ]), 1, 8)))
       
@@ -1274,7 +1260,7 @@ for (i in (ech[1:4])) {
         
         fichier <- read_csv(paste0("Data/Circuit B/B-IJPB-Versailles/INTERLABO24_240605/INTERLABO24_240605/", tableau[y[j], colonne_fichier]), show_col_types = FALSE)
         
-        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
+        Base_De_Donnees_Spectres[[Annee]][[paste0("BGE", i)]][[Labo]][[Spectro]][[paste0("Mesure_", (j + l))]][["Meta"]] <- data.frame(Circuit = Circuit, Nb_Rep = (j - k), Type_Rep = typ_rep, Resolution = Resolution, Unite_X = Unite_X, Abs_ou_Ref = Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = substr(as.character(fichier[5, ]), 12, nchar(as.character(fichier[5, ]))), Heure = substr(as.character(fichier[6, ]), 8, nchar(as.character(fichier[6, ]))), Temperature = Temperature, Hygrometrie = Hygrometrie)
       
         unite <- c(as.numeric(substr(as.character(fichier[45, ]), 1, 8)))
         
@@ -1312,7 +1298,7 @@ for (i in 1:9) {
 text(12000, 0.5, "Coupelles")
 
 for (i in 1:5) {
-lines(x = Base_De_Donnees_Spectres$Annee2023$BGE3$BIOGECO_Bordeaux$MPA1_Fibre[[i]][[2]][[1]], y = Base_De_Donnees_Spectres$Annee2023$BGE3$BIOGECO_Bordeaux$MPA1_Fibre[[i]][[2]][[2]], type = "l", col = i + 9)
+  lines(x = Base_De_Donnees_Spectres$Annee2023$BGE3$BIOGECO_Bordeaux$MPA1_Fibre[[i]][[2]][[1]], y = Base_De_Donnees_Spectres$Annee2023$BGE3$BIOGECO_Bordeaux$MPA1_Fibre[[i]][[2]][[2]], type = "l", col = i + 9)
 }
 text(6000, 0.2, "Fibre", col = "red") 
 
@@ -1365,17 +1351,92 @@ Base_De_Donnees_Spectres[[a]][[i]][[lab]][[spectro]][[mesure]][[1]][[4]]
 ```
 
 ```{r}
-for (ann in (1:2)) {
-  for (ech in 1:length(Base_De_Donnees_Spectres[[ann]])) {
-    # for (lab in 1:length(Base_De_Donnees_Spectres[[ann]][[ech]])) {
-    for (lab in 4) {
-      for (spec in 1) {
-        temp <- Base_De_Donnees_Spectres[[ann]][[ech]][[lab]][[spec]]
-        Base_De_Donnees_Spectres[[ann]][[ech]][[lab]][["Thermo Antaris II"]] <- list.append(temp)
-        Base_De_Donnees_Spectres[[ann]][[ech]][[lab]][[1]] <- NULL
+for (i in 1:178) {
+  for (j in 10:17) {
+    for (k in 1) {
+      for (l in 1) {
+        if(Base_De_Donnees_Spectres$Annee2022[[i]][[j]][["FOSS 2500"]][[k]][[2]][[1]][[2]] - Base_De_Donnees_Spectres$Annee2022[[i]][[j]][["FOSS 2500"]][[k]][[2]][[1]][[1]] != 0.5){
+          print(i)
+          print(j)
+        }
       }
     }
   }
 }
+
+for (i in 1:178) {
+  for (j in 10:17) {
+    for (l in 1:2) {
+      for (k in 1) {
+        if(Base_De_Donnees_Spectres$Annee2022[[i]][[j]][[l]][[k]][[2]][[1]][[1]] != 400){
+          print(i)
+          print(j)
+        }
+      }
+    }
+  }
+}
+
+for (i in 1:30) {
+  for (j in 10:17) {
+    for (k in 1) {
+      for (l in 1) {
+        if(Base_De_Donnees_Spectres$Annee2023[[i]][[j]][["FOSS 6500"]][[k]][[2]][[1]][[2]] - Base_De_Donnees_Spectres$Annee2023[[i]][[j]][["FOSS 6500"]][[k]][[2]][[1]][[1]] != 2){
+          print(i)
+          print(j)
+        }
+      }
+    }
+  }
+}
+
+for (i in 1:30) {
+  for (j in 10:17) {
+    for (k in 1:2) {
+      for (l in 1:length(Base_De_Donnees_Spectres$Annee2023[[i]][[j]][[k]])) {
+        if(Base_De_Donnees_Spectres$Annee2023[[i]][[j]][[k]][[l]][[2]][[1]][[1]] != 400){
+          print(i)
+          print(j)
+          print(k)
+        }
+      }
+    }
+  }
+}
+```
+
+```{r}
+for (m in 1:2) {
+  for (i in 1:length(Base_De_Donnees_Spectres[[m]])) {
+    for (j in 2) {
+      for (k in 2:3) {
+        for (l in 1:length(Base_De_Donnees_Spectres[[m]][[i]][[j]][[k]])) {
+          a = Base_De_Donnees_Spectres[[m]][[i]][[j]][[k]][[l]][[1]]
+          Base_De_Donnees_Spectres[[m]][[i]][[j]][[k]][[l]][[1]] = data.frame(Circuit = a$Circuit, Nb_Rep = a$Nb_Rep, Type_Rep = a$Type_Rep, Resolution = a$Resolution, Unite_X = a$Unite_X, Abs_ou_Ref = a$Abs_ou_Ref, Labo_ou_Terrain = Labo_ou_Terrain, Date = a$Date, Heure = a$Heure, Temperature = a$Temperature, Hygrometrie = a$Hygrometrie)
+        }
+      }
+    }
+  }
+}
+
+```
+
+```{r}
+for (m in 1:2) {
+  for (i in 1:length(Base_De_Donnees_Spectres[[m]])) {
+    for (j in 1:length(Base_De_Donnees_Spectres[[m]][[i]]) {
+      
+    }
+  }
+}
+```
+
+```{r}
+plot(Base_De_Donnees_Spectres$Annee2022$BGE1$IGEPP_Rennes$`BRUKER MPA`$Mesure_1$Spectre, type = 'l')
+plot(Base_De_Donnees_Spectres$Annee2022$BGE1$`PEGASE_St-Gilles`$`VIAVI MicroNIRS`$Mesure_1$Spectre, type = 'l')
+plot(Base_De_Donnees_Spectres$Annee2022$BGE1$`PEGASE_St-Gilles`$`IDiL FlameNIR`$Mesure_1$Spectre, type = 'l')
+plot(Base_De_Donnees_Spectres$Annee2023$BGE3$IGEPP_Rennes$`BRUKER MPA`$Mesure_1$Spectre, type = 'l')
+plot(Base_De_Donnees_Spectres$Annee2023$BGE3$`PEGASE_St-Gilles`$`VIAVI MicroNIRS`$Mesure_1$Spectre, type = 'l')
+plot(Base_De_Donnees_Spectres$Annee2023$BGE3$`PEGASE_St-Gilles`$`IDiL FlameNIR`$Mesure_1$Spectre, type = 'l')
 ```
 
